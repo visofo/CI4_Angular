@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-login',
@@ -68,4 +69,29 @@ export class Login {
     password: string = '';
 
     checked: boolean = false;
+    loginForm!: FormGroup;
+    errorMessage: string = '';
+
+    constructor(private fb: FormBuilder, private authService: AuthService) { }
+
+  ngOnInit(): void {
+    this.loginForm = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+  }
+
+  onSubmit() {
+    if (this.loginForm.valid) {
+      this.authService.login(this.loginForm.value).subscribe(
+        res => {
+          localStorage.setItem('token', res.token);
+          // Redirecionar ou tratar o login com sucesso
+        },
+        err => {
+          this.errorMessage = 'Erro no login!';
+        }
+      );
+    }
+  }
 }
