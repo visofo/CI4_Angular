@@ -7,7 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from './auth.service';
 
 @Component({
     selector: 'app-login',
@@ -83,7 +83,9 @@ export class Login {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe(
+
+      const data = this.loginForm.value;
+      this.authService.login(data.email, data.senha).subscribe(
         res => {
           localStorage.setItem('token', res.token);
           // Redirecionar ou tratar o login com sucesso
