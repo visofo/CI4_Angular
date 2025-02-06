@@ -18,6 +18,7 @@ class JWTAuthFilter implements FilterInterface
         }
         // Geralmente o header vem como "Bearer token"
         $arr = explode(" ", $authHeader);
+        //$token = $arr[1] ?? null;
         $token = isset($arr[1]) ? $arr[1] : null;
         if (!$token) {
             return Services::response()->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED, 'Token inválido');

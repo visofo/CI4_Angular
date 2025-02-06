@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    image: php:8.0-apache
+    container_name: ci4_app
+    volumes:
+      - /mnt/F/workspace/CI4_Angular/ci4-api:/var/www/html
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      - CI_ENV=development
+    command: >
+      bash -c "a2enmod rewrite && apache2-foreground"
+
+  db:
+    image: mysql:5.7
+    container_name: ci4_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ci4_db
+      MYSQL_USER: ci4user
+      MYSQL_PASSWORD: ci4pass
+    ports:
+      - "3306:3306"
+
+  frontend:
+    image: node:14
+    container_name: angular_app
+    working_dir: /usr/src/app
+    volumes:
+      - /mnt/F/workspace/CI4_Angular/frontend:/usr/src/app
+    ports:
+      - "4200:4200"
+    command: >
+      bash -c "npm install && ng serve --host 0.0.0.0"

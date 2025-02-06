@@ -34,9 +34,10 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
-        'jwtAuth' => \App\Filters\JWTAuthFilter::class,
+        'cors' => \App\Filters\Cors::class,
     ];
-
+    
+    // 'jwtAuth' => \App\Filters\JWTAuthFilter::class,
     /**
      * List of special required filters.
      *
@@ -54,6 +55,7 @@ class Filters extends BaseFilters
         'before' => [
             'forcehttps', // Force Global Secure Requests
             'pagecache',  // Web Page Caching
+            'cors'
         ],
         'after' => [
             'pagecache',   // Web Page Caching
@@ -105,6 +107,6 @@ class Filters extends BaseFilters
      * @var array<string, array<string, list<string>>>
      */
     public array $filters = [
-        'jwtAuth' => ['before' => ['api/*'], 'except' => ['api/login']]
     ];
+    // 'jwtAuth' => ['before' => ['api/*'], 'except' => ['api/login']]
 }

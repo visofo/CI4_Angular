@@ -1,39 +1,60 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  web:
-    image: php:8.0-apache
-    container_name: ci4_app
-    volumes:
-      - /mnt/F/workspace/CI4_Angular/ci4-api:/var/www/html
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
-    environment:
-      - CI_ENV=development
-    command: >
-      bash -c "a2enmod rewrite && apache2-foreground"
-
   db:
-    image: mysql:5.7
-    container_name: ci4_db
+    image: mysql:8.0
+    container_name: eschool_db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ci4_db
-      MYSQL_USER: ci4user
-      MYSQL_PASSWORD: ci4pass
+      MYSQL_DATABASE: eschool_db
+      MYSQL_USER: eschool_user
+      MYSQL_PASSWORD: eschool_password
+    volumes:
+      - db_data:/var/lib/mysql
     ports:
       - "3306:3306"
+    networks:
+      - eschool_network
 
-  frontend:
-    image: node:14
-    container_name: angular_app
-    working_dir: /usr/src/app
+  ci4:
+    build:
+      context: ./ci4-api
+      dockerfile: Dockerfile
+    container_name: eschool_ci4
+    ports:
+      - "8080:80"
     volumes:
-      - /mnt/F/workspace/CI4_Angular/frontend:/usr/src/app
+      - ./ci4-api:/var/www/html/public_html/eSchool
+    environment:
+      APP_ENVIRONMENT: development
+      database.default.hostname: db
+      database.default.database: eschool_db
+      database.default.username: eschool_user
+      database.default.password: eschool_password
+      database.default.port: 3306
+    depends_on:
+      - db
+    networks:
+      - eschool_network
+
+  angular:
+    build:
+      context: ./angular-app
+      dockerfile: Dockerfile
+    container_name: eschool_angular
     ports:
       - "4200:4200"
-    command: >
-      bash -c "npm install && ng serve --host 0.0.0.0"
+    volumes:
+      - ./angular-app:/app
+    depends_on:
+      - ci4
+    networks:
+      - eschool_network
+
+volumes:
+  db_data:
+
+networks:
+  eschool_network:
+    driver: bridge
